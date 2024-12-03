@@ -51,7 +51,28 @@ async function fetchLatestSentEmail() {
             process.exit(0); // Explicitly end the program
         }
 
-        const latestEmail = messages[messages.length - 1];
+        const emailDataArray = [];
+
+        for(let i = messages.length - 1; i >= messages.length - 30; i--){
+            const Email = messages[i];
+
+            const subject = Email.parts.filter(part => part.which === 'HEADER.FIELDS (FROM SUBJECT DATE)')[0].body.subject;
+            const textContent = Email.parts.filter(part => part.which === 'TEXT')[0].body;
+
+            // Ensure subject is treated as a string
+            const subjectText = subject ? subject.toString() : "No subject";
+            const wordCount = (textContent.match(/\w+/g) || []).length + 1 + (subjectText.match(/\w+/g) || []).length;
+
+            const emailData = {
+                subject: subjectText,
+                textContent: textContent,
+                wordCount: wordCount
+            };
+
+            emailDataArray.push(emailData);
+        }
+        
+        /*const latestEmail = messages[messages.length - 1];
         const subject = latestEmail.parts.filter(part => part.which === 'HEADER.FIELDS (FROM SUBJECT DATE)')[0].body.subject;
         const textContent = latestEmail.parts.filter(part => part.which === 'TEXT')[0].body;
 
@@ -70,10 +91,10 @@ async function fetchLatestSentEmail() {
             subject: subjectText,
             textContent: textContent,
             wordCount: wordCount
-        };
+        };*/
 
         // Save the email data to a JSON file
-        fs.writeFileSync('email_data.json', JSON.stringify(emailData, null, 2));
+        fs.writeFileSync('email_data.json', JSON.stringify(emailDataArray, null, 2));
 
         console.log('Email data saved to email_data.json');
 

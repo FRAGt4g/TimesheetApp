@@ -5,10 +5,10 @@ import { Text, View } from '@/components/Themed';
 import { Button } from 'react-native';
 import * as Contacts from "expo-contacts"
 
-export default function TabOneScreen() {
+export default function TabThreeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
+      <Text style={styles.title}>Tab Thee</Text>
       <Button title="testing" onPress={
           (async () => {
             console.log("testing...")

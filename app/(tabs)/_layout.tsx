@@ -27,7 +27,7 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, true),
       }}>
       <Tabs.Screen
-        name="main"
+        name="index"
         options={{
           title: 'Test Data Gathering',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,

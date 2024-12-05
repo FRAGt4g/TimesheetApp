@@ -1,14 +1,7 @@
 import HView from '@/components/HView';
+import Gmail_Auth from '@/components/Gmail_Auth';
 import React, { useState } from 'react';
-import { Button } from 'react-native';
-import {
-  FlatList,
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { Button, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 const data = [
   {
@@ -60,6 +53,15 @@ export default function TabOneScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
+      
+      <View style={{
+        marginBottom: 100,
+        zIndex: 10,
+        justifyContent: "space-between"
+      }}>
+        <Gmail_Auth/>
+      </View>
+      
       {/* Results Container with BlurView */}
       <View style={styles.resultsContainer}>
         <HView style={{

@@ -45,7 +45,6 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
@@ -78,7 +77,6 @@ export default function TabOneScreen() {
           </Text>
         ))}
       </View>
-
     </View>
   );
 }

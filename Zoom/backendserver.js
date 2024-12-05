@@ -6,8 +6,8 @@ const app = express();
 const PORT = 5500;
 var access_token;
 // Zoom OAuth URLs and credentials
-const CLIENT_ID = 'FpihQgYGTluJCPBD6Q_A';
-const CLIENT_SECRET = 'RZ6W93ca295pb1DNVH7G3x4M4O1Es6YC';
+const CLIENT_ID = 'CLIENTID';
+const CLIENT_SECRET = 'CLIENTSECRET';
 const REDIRECT_URI = 'http://localhost:5500/oauth/callback'; // Replace with your callback URL
 const TOKEN_URL = 'https://zoom.us/oauth/token';
 

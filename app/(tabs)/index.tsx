@@ -1,4 +1,5 @@
 import HView from '@/components/HView';
+import Gmail_Auth from '@/components/Gmail_Auth';
 import React, { useState } from 'react';
 import {
   FlatList,

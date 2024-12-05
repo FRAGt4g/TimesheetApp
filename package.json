@@ -10,6 +10,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "testback": "node googleMail.js"
+    "test": "jest --watchAll",
+    "testback": "node googleMail.js"
   },
   "jest": {
     "preset": "jest-expo"

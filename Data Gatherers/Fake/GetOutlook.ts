@@ -1,5 +1,5 @@
 import { Gatherer, initData } from "./_layout"
-import OutlookKeys from "../Secrets/OutlookKeys.json"
+// import OutlookKeys from "../Secrets/OutlookKeys.json"
 
 
 const GatherOutlook: Gatherer = initData({
@@ -8,7 +8,7 @@ const GatherOutlook: Gatherer = initData({
         status: "finished",
         gatherType: "Outlook",
         information: {
-            hi: OutlookKeys["clientId"]
+            hi: "testing"
         }
     })
 })

@@ -59,7 +59,7 @@ app.get("/oauth/callback", async (req, res) => {
       res.status(400).send("Failed to obtain token.");
     }
   } catch (error) {
-    console.error("Error exchanging token:", error.message);
+    console.error("Error exchanging token:", error/*.message*/);
     res.status(500).send("An error occurred during OAuth callback.");
   }
 });
@@ -85,7 +85,7 @@ const fetchSlackMessages = async (token: string) => {
       console.log(`Messages in ${channel.name}:`, historyResponse.data.messages);
     }
   } catch (error) {
-    console.error("Error fetching messages:", error.message);
+    console.error("Error fetching messages:", error/*.message*/);
   }
 };
 

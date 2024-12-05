@@ -10,8 +10,6 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "testback": "node googleMail.js"
-    "test": "jest --watchAll",
-    "testback": "node googleMail.js"
   },
   "jest": {
     "preset": "jest-expo"
@@ -49,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/express": "^5.0.0",
     "@types/imap-simple": "^4.2.9",
     "@types/mailparser": "^3.4.5",
     "@types/react": "~18.3.12",

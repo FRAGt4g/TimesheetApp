@@ -34,3 +34,11 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+<<<<<<< HEAD
+
+#Secrets
+/Secrets/*
+
+.env
+=======
+>>>>>>> parent of 4d5986b (Working on adding outlook functionality)

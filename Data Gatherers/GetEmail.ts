@@ -1,20 +1,18 @@
-import { Gatherer, DataShape } from "./_layout"
+import { Gatherer, initData } from "./_layout"
 
-const GatherEmail: Gatherer = {
+const GatherEmail: Gatherer = initData({
     title: "Gather Email...",
-    gatherFunc: () => {
-        return {
-            status: "testing",
-            gatherType: "Email",
-            information: {
-                something: "value",
-                other: {
-                    moreStuff: "value",
-                    hi: "value"
-                }
+    gatherFunc: () => ({
+        status: "testing",
+        gatherType: "Email",
+        information: {
+            something: "value",
+            other: {
+                moreStuff: "value",
+                hi: "value"
             }
         }
-    }
-}
+    })
+})
 
 export default GatherEmail

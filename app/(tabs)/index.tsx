@@ -1,26 +1,26 @@
 import HView from '@/components/HView';
 import React, { useState } from 'react';
-import { Button } from 'react-native';
 import {
   FlatList,
   Text,
   View,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
 import { Gatherer, DataShape } from "../../Data Gatherers/_layout"
+
 import GetEmail from "../../Data Gatherers/GetEmail"
 import GetIcloud from "../../Data Gatherers/GetIcloud"
-import { Header } from 'react-native/Libraries/NewAppScreen';
+import GetOutlook from "../../Data Gatherers/GetOutlook"
 
-const gatherOptions: Gatherer[] = [
+const gatherOptions = [
   GetEmail,
-  GetIcloud
-];
+  GetIcloud,
+  GetOutlook
+]
 
 const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: DataShape) => void }) => {
-  const { title, gatherFunc } = item;
+  const { id, title, gatherFunc } = item;
   return (
     <TouchableOpacity
       style={styles.item}
@@ -36,7 +36,6 @@ const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: Dat
 
 export default function TabOneScreen() {
   const [results, setResults] = useState<DataShape[]>([]);
-
   const handlePress = (result: DataShape) => {
     setResults((prevResults) => [...prevResults, result]);
   };
@@ -45,7 +44,7 @@ export default function TabOneScreen() {
     <View style={styles.container}>
       <FlatList
         data={gatherOptions}
-        keyExtractor={(item) => item.title}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <GatherButton item={item} onPress={handlePress} />
         )}
@@ -60,18 +59,19 @@ export default function TabOneScreen() {
             <Text style={{ fontSize: 24 }}>🗑️</Text>
           </TouchableOpacity>
         </HView>
-        {results.map((result, index) => (
+        {results.map((result, index) => {
+          return (
           <View key={index}>
-            <Text style={styles.resultText}>
+            <Text key={index} style={styles.resultText}>
               {result.gatherType}
             </Text>
             {Object.entries(result.information).map(([key, value]) => (
-              <Text>
+              <Text key={key}>
                 {JSON.stringify(key)}: {JSON.stringify(value)}
               </Text>
             ))}
           </View>
-        ))}
+        )})}
       </View>
     </View>
   );

@@ -1,16 +1,17 @@
-import { Gatherer, DataShape } from "./_layout"
+import { Gatherer, initData } from "./_layout"
 
-const GatherIcloud: Gatherer = {
-    title: "Gather ICloud...",
-    gatherFunc: () => {
-        return {
-            status: "done",
-            gatherType: "Icloud",
-            information: {
-                something: "value",
+const GatheriCloud: Gatherer = initData({
+    title: "Gather iCloud...",
+    gatherFunc: () => ({
+        status: "done",
+        gatherType: "iCloud",
+        information: {
+            other: {
+                moreStuff: "value",
+                hi: "value"
             }
         }
-    }
-}
+    })
+})
 
-export default GatherIcloud
+export default GatheriCloud

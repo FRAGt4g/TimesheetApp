@@ -1,33 +1,32 @@
 import HView from '@/components/HView';
 import Gmail_Auth from '@/components/Gmail_Auth';
 import React, { useState } from 'react';
-import { Button, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  FlatList,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import { Gatherer, DataShape } from "../../Data Gatherers/Fake/_layout"
 
-const data = [
-  {
-    id: '1',
-    title: 'Gather Emails',
-    func: () => ({ type: 'emails', status: 'success' }),
-  },
-  {
-    id: '2',
-    title: 'Gather Zoom Meetings',
-    func: () => ({ type: 'zoom meetings', status: 'success' }),
-  },
-  {
-    id: '3',
-    title: 'Gather Slack Messages',
-    func: () => ({ type: 'slack messages', status: 'success' }),
-  },
-];
+import GetEmail from "../../Data Gatherers/Fake/GetEmail"
+import GetIcloud from "../../Data Gatherers/Fake/GetIcloud"
+import GetOutlook from "../../Data Gatherers/Fake/GetOutlook"
 
-const ListItem = ({ item, onPress }: { item: { title: string; func: () => object }; onPress: (result: object) => void }) => {
-  const { title, func } = item;
+const gatherOptions = [
+  GetEmail,
+  GetIcloud,
+  GetOutlook
+]
+
+const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: DataShape) => void }) => {
+  const { id, title, gatherFunc } = item;
   return (
     <TouchableOpacity
       style={styles.item}
       onPress={() => {
-        const result = func();
+        const result = gatherFunc();
         onPress(result);
       }}
     >
@@ -37,45 +36,43 @@ const ListItem = ({ item, onPress }: { item: { title: string; func: () => object
 };
 
 export default function TabOneScreen() {
-  const [results, setResults] = useState<object[]>([]);
-
-  const handlePress = (result: object) => {
+  const [results, setResults] = useState<DataShape[]>([]);
+  const handlePress = (result: DataShape) => {
     setResults((prevResults) => [...prevResults, result]);
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={data}
+        data={gatherOptions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ListItem item={item} onPress={handlePress} />
+          <GatherButton item={item} onPress={handlePress} />
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-      
-      <View style={{
-        marginBottom: 100,
-        zIndex: 10,
-        justifyContent: "space-between"
-      }}>
-        <Gmail_Auth/>
-      </View>
-      
-      {/* Results Container with BlurView */}
       <View style={styles.resultsContainer}>
         <HView style={{
-          marginBottom: 5,
           justifyContent: "space-between"
         }}>
           <Text style={styles.resultsHeader}>Results:</Text>
-          <Button title="Clear" onPress={() => setResults([])} />
+          <TouchableOpacity onPress={() => setResults([])}>
+            <Text style={{ fontSize: 24 }}>🗑️</Text>
+          </TouchableOpacity>
         </HView>
-        {results.map((result, index) => (
-          <Text key={index} style={styles.resultText}>
-            {JSON.stringify(result)}
-          </Text>
-        ))}
+        {results.map((result, index) => {
+          return (
+          <View key={index}>
+            <Text key={index} style={styles.resultText}>
+              {result.gatherType}
+            </Text>
+            {Object.entries(result.information).map(([key, value]) => (
+              <Text key={key}>
+                {JSON.stringify(key)}: {JSON.stringify(value)}
+              </Text>
+            ))}
+          </View>
+        )})}
       </View>
     </View>
   );
@@ -118,5 +115,8 @@ const styles = StyleSheet.create({
   resultText: {
     fontSize: 16,
     color: '#333',
+    fontWeight: "bold",
+    textTransform: "capitalize",
+    marginTop: 10
   },
 });

@@ -84,6 +84,7 @@ export default function TabOneScreen() {
         <FlatList
           data={results}
           style={{paddingTop: padding}}
+          //TODO: Fix this to be an actual key using date asked for/time recieved
           keyExtractor={(item) => JSON.stringify(item.information)}
           renderItem={({ item }) => (
             <View style={{marginVertical: 5}}>

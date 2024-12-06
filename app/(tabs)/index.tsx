@@ -8,11 +8,11 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { Gatherer, DataShape } from "../../Data Gatherers/Fake/_layout"
+import { Gatherer, DataShape } from "../../data_gatherers/Fake/_layout"
 
-import GetEmail from "../../Data Gatherers/Fake/GetEmail"
-import GetIcloud from "../../Data Gatherers/Fake/GetIcloud"
-import GetOutlook from "../../Data Gatherers/Fake/GetOutlook"
+import GetEmail from "../../data_gatherers/Fake/GetEmail"
+import GetIcloud from "../../data_gatherers/Fake/GetIcloud"
+import GetOutlook from "../../data_gatherers/Fake/GetOutlook"
 
 const gatherOptions = [
   GetEmail,

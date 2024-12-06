@@ -27,14 +27,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Test Data Gathering',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="address-card" color={color} />,
         }}
       />
       <Tabs.Screen
         name="other"
         options={{
-          title: 'Prebuilt',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Testing Space',
+          tabBarIcon: ({ color }) => <TabBarIcon name="align-left" color={color} />,
         }}
       />
     </Tabs>

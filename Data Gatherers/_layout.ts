@@ -4,11 +4,11 @@ import { v4 as UUID } from 'uuid';
 type Gatherer = {
     id: string,
     title: string,
-    gatherFunc: () => DataShape
+    gatherFunc: () => Promise<DataShape>
 }
 
 type DataShape = {
-    status: string,
+    error?: string,
     gatherType: string,
     information: object,
 }
@@ -18,7 +18,7 @@ export const initData = ({
     gatherFunc 
 }: { 
     title: string; 
-    gatherFunc: () => DataShape
+    gatherFunc: () => Promise<DataShape>
 }): Gatherer => ({
     id: UUID(),
     title: title,

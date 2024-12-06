@@ -7,30 +7,50 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
-import { Gatherer, DataShape } from "../../Data Gatherers/Fake/_layout"
+import { Gatherer, DataShape } from "../../Data Gatherers/_layout"
+import { SymbolView } from "expo-symbols"
 
 import GetEmail from "../../Data Gatherers/Fake/GetEmail"
 import GetIcloud from "../../Data Gatherers/Fake/GetIcloud"
 import GetOutlook from "../../Data Gatherers/Fake/GetOutlook"
+import GetGithub from "../../Data Gatherers/Fake/GetGithub"
+import Spacer from '@/components/Spacer';
 
 const gatherOptions = [
   GetEmail,
   GetIcloud,
-  GetOutlook
+  GetOutlook,
+  GetGithub
 ]
 
 const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: DataShape) => void }) => {
   const { id, title, gatherFunc } = item;
+  const [loading, setLoading] = useState(false)
+  
+  const handleFetchData = async () => {
+    if (loading) { return }
+    setLoading(true)
+    const data = await gatherFunc()
+    setLoading(false)
+    onPress(data);
+  }
+
   return (
     <TouchableOpacity
       style={styles.item}
-      onPress={() => {
-        const result = gatherFunc();
-        onPress(result);
-      }}
+      onPress={ handleFetchData }
     >
-      <Text>{title}</Text>
+      <Text style={{ lineHeight: 20 }} >{title}</Text>
+      <Spacer />
+      {loading && 
+        <SymbolView 
+          name='hourglass' 
+          tintColor="black"
+          size={20}
+        />
+      }
     </TouchableOpacity>
   );
 };
@@ -38,8 +58,9 @@ const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: Dat
 export default function TabOneScreen() {
   const [results, setResults] = useState<DataShape[]>([]);
   const handlePress = (result: DataShape) => {
-    setResults((prevResults) => [...prevResults, result]);
+    setResults((prevResults) => [result, ...prevResults]);
   };
+  const padding = results.length > 0 ? 10 : 0
 
   return (
     <View style={styles.container}>
@@ -60,19 +81,24 @@ export default function TabOneScreen() {
             <Text style={{ fontSize: 24 }}>🗑️</Text>
           </TouchableOpacity>
         </HView>
-        {results.map((result, index) => {
-          return (
-          <View key={index}>
-            <Text key={index} style={styles.resultText}>
-              {result.gatherType}
-            </Text>
-            {Object.entries(result.information).map(([key, value]) => (
-              <Text key={key}>
-                {JSON.stringify(key)}: {JSON.stringify(value)}
+        <FlatList
+          data={results}
+          style={{paddingTop: padding}}
+          keyExtractor={(item) => JSON.stringify(item.information)}
+          renderItem={({ item }) => (
+            <View style={{marginVertical: 5}}>
+              <Text style={[styles.resultText, item.error != null ? { color: "red"} : null]}>
+                {item.gatherType}
               </Text>
-            ))}
-          </View>
-        )})}
+              {Object.entries(item.information).map(([key, value]) => (
+                <Text key={key}>
+                  {JSON.stringify(key)}: {JSON.stringify(value)}
+                </Text>
+              ))}
+            </View>
+          )}
+          ItemSeparatorComponent={() => <View style={[styles.separator, { backgroundColor: "black"}]} />}
+        />
       </View>
     </View>
   );
@@ -92,6 +118,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginVertical: 5,
+    flexDirection: "row"
   },
   separator: {
     height: 1,
@@ -99,14 +126,15 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   resultsContainer: {
-    position: 'absolute', // Overlap the list
-    bottom: 20, // Stick to the bottom of the screen
+    position: 'absolute',
+    bottom: 20,
     left: 20,
     right: 20,
+    maxHeight: 250, // Allow room for the scrollable content
     padding: 15,
     borderRadius: 10,
-    zIndex: 1, // Ensure the results are on top of the list
-    backgroundColor: "#ddd"
+    zIndex: 1,
+    backgroundColor: "#ddd",
   },
   resultsHeader: {
     fontSize: 18,
@@ -117,6 +145,5 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: "bold",
     textTransform: "capitalize",
-    marginTop: 10
   },
 });

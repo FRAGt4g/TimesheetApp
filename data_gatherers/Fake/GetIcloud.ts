@@ -1,17 +1,20 @@
-import { Gatherer, initData } from "./_layout"
+import { Gatherer, initData, DataShape } from "../_layout"
 
 const GatheriCloud: Gatherer = initData({
     title: "Gather iCloud...",
-    gatherFunc: () => ({
-        status: "done",
-        gatherType: "iCloud",
-        information: {
-            other: {
-                moreStuff: "value",
-                hi: "value"
-            }
-        }
-    })
+    gatherFunc: () => (new Promise<DataShape>(resolve => {
+        setTimeout(() => {
+            resolve({
+                gatherType: "iCloud",
+                information: {
+                    other: {
+                        moreStuff: "value",
+                        hi: "value"
+                    }
+                }
+            })
+        }, 20)
+    }))
 })
 
 export default GatheriCloud

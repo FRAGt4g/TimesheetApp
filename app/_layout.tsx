@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import * as Contacts from "expo-contacts"
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { Text } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -38,28 +39,6 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
-
-  let [err, setErr] = useState();
-  let [contacts, setContacts] = useState<Contacts.Contact[]>([]);
-  useEffect( () => {
-    (async () => {
-      console.log("testing...")
-      const { status } = await Contacts.requestPermissionsAsync();
-      if (status === "granted") {
-        const { data } = await Contacts.getContactsAsync({
-          fields: [Contacts.Fields.Name, Contacts.Fields.Emails]
-        })
-
-        if (data.length > 0) {
-          console.log(data)
-          setContacts(data)
-        }
-      }
-      else {
-        console.log("permission denied")
-      }
-    })
-  }, [])
 
   if (!loaded) {
     return null;

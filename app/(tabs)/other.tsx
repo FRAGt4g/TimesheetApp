@@ -2,34 +2,29 @@ import { StyleSheet } from 'react-native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
-import { Button } from 'react-native';
+import { Button, ScrollView } from 'react-native';
 import * as Contacts from "expo-contacts"
 
 export default function TabThreeScreen() {
+  const dummyData = [
+    "testing",
+    "another",
+    "third",
+    "why not",
+    "more stuff",
+    "another",
+    "this again...",
+    "for good measure",
+    "why the hell not"
+  ]
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Three</Text>
-      <Button title="testing" onPress={
-          (async () => {
-            console.log("testing...")
-            const { status } = await Contacts.requestPermissionsAsync();
-            if (status === "granted") {
-              const { data } = await Contacts.getContactsAsync({
-                fields: [Contacts.Fields.Name, Contacts.Fields.Emails]
-              })
-      
-              if (data.length > 0) {
-                console.log(data)
-              }
-            }
-            else {
-              console.log("permission denied")
-            }
-          })
-      } />
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ScrollView>
+      { dummyData.map((item) => {
+        return (<Text style={styles.title}>
+          {item}
+        </Text>)
+      }) }
+    </ScrollView>
   );
 }
 
@@ -42,6 +37,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    padding: 20,
+    borderRadius: 20,
+    margin: 20,
+    backgroundColor: "#ffaaaa"
   },
   separator: {
     marginVertical: 30,

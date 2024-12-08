@@ -2,13 +2,15 @@ const express = require('express');
 const axios = require('axios');
 const qs = require('qs');
 
+require('dotenv').config();
+
 const app = express();
 const PORT = 5500;
 var access_token;
 // Zoom OAuth URLs and credentials
-const CLIENT_ID = 'FpihQgYGTluJCPBD6Q_A';
-const CLIENT_SECRET = 'RZ6W93ca295pb1DNVH7G3x4M4O1Es6YC';
-const REDIRECT_URI = 'http://localhost:5500/oauth/callback'; // Replace with your callback URL
+const CLIENT_ID = ZOOM_CLIENT_ID;
+const CLIENT_SECRET = ZOOM_CLIENT_SECRET;
+const REDIRECT_URI = ZOOM_REDIRECT_URI; // Replace with your callback URL
 const TOKEN_URL = 'https://zoom.us/oauth/token';
 
 // Serve the authorization URL

@@ -1,58 +1,86 @@
-import HView from '@/components/HView';
-import Gmail_Auth from '@/components/Gmail_Auth';
 import React, { useState } from 'react';
-import {
-  FlatList,
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-<<<<<<< HEAD:app/(tabs)/index.tsx
-import { Gatherer, DataShape } from "../../data_gatherers/Fake/_layout"
-
-import GetEmail from "../../data_gatherers/Fake/GetEmail"
-import GetIcloud from "../../data_gatherers/Fake/GetIcloud"
-import GetOutlook from "../../data_gatherers/Fake/GetOutlook"
-=======
-import { Gatherer, DataShape } from "../../Data Gatherers/_layout"
-import { SymbolView } from "expo-symbols"
-
-import GetEmail from "../../Data Gatherers/Fake/GetEmail"
-import GetIcloud from "../../Data Gatherers/Fake/GetIcloud"
-import GetOutlook from "../../Data Gatherers/Fake/GetOutlook"
-import GetGithub from "../../Data Gatherers/Fake/GetGithub"
+import { FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Gatherer, DataShape } from '@/app/(tabs)/layouts';
+import { SymbolView } from "expo-symbols";
+import axios from 'axios';
 import Spacer from '@/components/Spacer';
->>>>>>> master:app/(tabs)/data.tsx
+import HView  from '@/components/HView';
 
 const gatherOptions = [
-  GetEmail,
-  GetIcloud,
-  GetOutlook,
-  GetGithub
-]
+  {
+    id: 'gmail',
+    title: 'Fetch Gmail Data',
+    gatherFunc: async () => {
+      try {
+        const authResponse = await axios.get('http://localhost:8000/auth_google');
+        const authUrl = authResponse.data.authUrl;
+
+        alert('Please authenticate with Google: ' + authUrl);
+
+        const code = prompt('Enter the code from the callback URL:');
+        const dataResponse = await axios.get(`http://localhost:8000/auth_google_callback?code=${code}`);
+        
+        return dataResponse.data;  // Return Gmail data
+      } catch (error) {
+        console.error('Error fetching Gmail data:', error);
+        return { error: 'Error fetching Gmail data' };
+      }
+    },
+  },
+  {
+    id: 'github',
+    title: 'Fetch Github Data',
+    gatherFunc: async () => {
+      try {
+        let username = "FRAGt4g"
+        const response = await axios.get(`https://api.github.com/users/${username}`);
+
+        return {
+          gatherType: 'github',
+          information: {
+            login: response.data.login,
+            followers: response.data.followers,
+            following: response.data.following,
+            html_url: response.data.html_url,
+            avatar_url: response.data.avatar_url,
+          },
+        };
+      } catch (error) {
+        console.error("Error fetching Github data:", error);
+        return { error: "Error fetching Github data" };
+      }
+    },
+  },
+];
 
 const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: DataShape) => void }) => {
   const { id, title, gatherFunc } = item;
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   
   const handleFetchData = async () => {
-    if (loading) { return }
-    setLoading(true)
-    const data = await gatherFunc()
-    setLoading(false)
-    onPress(data);
-  }
+    if (loading) {
+      setLoading(true);
+      return;
+    }
+
+    try {
+      const data = await gatherFunc();
+      setLoading(false);
+      onPress(data);
+    } catch (error) {
+      setLoading(false)
+      console.error("Error during data fetching:", error);
+    }
+  };
 
   return (
     <TouchableOpacity
       style={styles.item}
-      onPress={ handleFetchData }
+      onPress={handleFetchData}
     >
       <Text style={{ lineHeight: 20 }} >{title}</Text>
       <Spacer />
-      {loading && 
+      {loading &&
         <SymbolView 
           name='hourglass' 
           tintColor="black"
@@ -68,7 +96,6 @@ export default function TabOneScreen() {
   const handlePress = (result: DataShape) => {
     setResults((prevResults) => [result, ...prevResults]);
   };
-  const padding = results.length > 0 ? 10 : 0
 
   return (
     <View style={styles.container}>
@@ -81,6 +108,8 @@ export default function TabOneScreen() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
       <View style={styles.resultsContainer}>
+
+        {/* <Text style={styles.resultsHeader}>Results:</Text> */}
         <HView style={{
           justifyContent: "space-between"
         }}>
@@ -89,20 +118,19 @@ export default function TabOneScreen() {
             <Text style={{ fontSize: 24 }}>🗑️</Text>
           </TouchableOpacity>
         </HView>
+
         <FlatList
           data={results}
-          style={{paddingTop: padding}}
-          //TODO: Fix this to be an actual key using date asked for/time recieved
+          style={{paddingTop: 10}}
+          //TODO: MAKE A KEY IM TIRED PROBABLT SOMETHING TO DO WITH TIME DATE THIS MIGHT ACTUALLY BE WHY GMAIL DOESNT WORK IDK 
           keyExtractor={(item) => JSON.stringify(item.information)}
           renderItem={({ item }) => (
             <View style={{marginVertical: 5}}>
-              <Text style={[styles.resultText, item.error != null ? { color: "red"} : null]}>
-                {item.gatherType}
+              <Text style={[styles.resultText, item.error ? { color: "red" } : null]}>
+                {item.gatherType || 'NO TYPE'}
               </Text>
               {Object.entries(item.information).map(([key, value]) => (
-                <Text key={key}>
-                  {JSON.stringify(key)}: {JSON.stringify(value)}
-                </Text>
+                <Text key={key}>{JSON.stringify(key)}: {JSON.stringify(value)}</Text>
               ))}
             </View>
           )}
@@ -118,9 +146,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f8f8f8',
-  },
-  scrollContainer: {
-    flexGrow: 1, // Ensures scrolling for the list items
   },
   item: {
     backgroundColor: '#fff',
@@ -139,7 +164,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    maxHeight: 250, // Allow room for the scrollable content
+    maxHeight: 250,
     padding: 15,
     borderRadius: 10,
     zIndex: 1,
@@ -153,6 +178,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     fontWeight: "bold",
-    textTransform: "capitalize",
   },
 });

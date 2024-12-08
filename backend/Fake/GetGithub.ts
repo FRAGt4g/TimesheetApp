@@ -33,8 +33,6 @@ const curryGetGithubUser = (username: string): () => Promise<DataShape> => {
 };
 
 
-
-
 const GatherGithub: Gatherer = initData({
     title: "Gather Github User...",
     gatherFunc: curryGetGithubUser("FRAGt4g")

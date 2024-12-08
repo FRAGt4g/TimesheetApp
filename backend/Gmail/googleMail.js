@@ -1,7 +1,8 @@
-require('dotenv').config();
 const express = require('express');
 const {google} = require('googleapis');
 const fs = require('fs'); 
+
+require('dotenv').config();
 
 const app = express();
 const port = 8000;
@@ -9,9 +10,9 @@ const port = 8000;
 const emailDataArray = [];
 
 const oauth2Client = new google.auth.OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URL
+    process.env.GMAIL_CLIENT_ID,
+    process.env.GMAIL_CLIENT_SECRET,
+    process.env.GMAIL_REDIRECT_URL
 );
 
 const scopes = ['https://www.googleapis.com/auth/gmail.readonly'];

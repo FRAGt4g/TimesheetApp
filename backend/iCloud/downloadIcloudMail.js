@@ -88,7 +88,17 @@ async function fetchLatestSentEmail() {
         rl.close();
         process.exit(0);
     } catch (err) {
-        console.error("An error occurred:", err);
+        if (err.message.includes("Authentication Failed")) {
+            console.error("Authentication Failed: Please check:");
+            console.error(" - that you typed in your icloud email correctly");
+            console.error(" - that you typed in your app specific password correctly");
+            console.log("    - To make app-specific password:");
+            console.log("    - go to appleid.apple.com");
+            console.log("    - Sign-In and Security > App-Specific Passwords.");
+            console.log("    - create an app-specific password");
+        } else {
+            console.error("An error occurred:", err.message);
+        }
         rl.close(); 
         process.exit(1);
     }

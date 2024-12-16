@@ -1,7 +1,7 @@
-const cors = require('cors');  // Import CORS middleware
-const { google } = require('googleapis');
+const cors = require('cors'); 
 const express = require('express');
 const axios = require('axios')
+const { google } = require('googleapis');
 const fs = require('fs');
 require('dotenv').config();
 
@@ -15,6 +15,10 @@ app.use(cors({
   credentials: true
 }));
 
+app.get('/hello', (req, res) => {
+  res.json({ message: 'Hello World' });
+});
+
 // ----------------------------------- GOOGLE API ----------------------------------- //
 const emailDataArray = [];
 
@@ -24,14 +28,14 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GMAIL_REDIRECT_URL
 );
 
-const scopes = ['https://www.googleapis.com/auth/gmail.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 
-app.get('/', (req, res) => {
+app.get('/auth_google', (req, res) => {
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: scopes
+    scope: SCOPES
   });
-  res.send(`<a href="${url}">Auth with Google</a>`);
+  res.json({ authUrl: url })
 });
 
 app.get('/google-callback', async (req, res) => {
@@ -39,54 +43,56 @@ app.get('/google-callback', async (req, res) => {
   const { tokens } = await oauth2Client.getToken(code);
   oauth2Client.setCredentials(tokens);
   readEmails(oauth2Client, res);
+  res.json({ message: 'Google Connected' });
 });
 
 async function readEmails(auth, res) {
-  const gmail = google.gmail({ version: 'v1', auth });
-  const response = await gmail.users.messages.list({
-    userId: 'me',
-    maxResults: 10
-  });
+  try {
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+    const response = await gmail.users.messages.list({
+      userId: 'me',
+      maxResults: 10
+    });
 
-  const messages = response.data.messages;
+    const messages = response.data.messages || []; 
+    const emails = await Promise.all(messages.map(async (message) => {
 
-  if (!messages) {
-    res.send('There are no messages');
-    return;
+      const response = await gmail.users.messages.get({userId: 'me', id: message.id});
+      
+      email = response.data
+      const subject = email.payload.headers.find(e => e.name == 'Subject').value || "No Subject";
+      const from = email.payload.headers.find(e => e.name == 'From').value || "Unknown";
+
+      let body = 'No body content';
+      if (email.payload.parts) {
+        const part = email.payload.parts.find(part => part.mimeType === 'text/plain');
+        if (part?.body?.data) {
+          body = Buffer.from(part.body.data, 'base64').toString('utf8');
+        }
+      }
+
+      const emailData = {
+        subject: subject,
+        from: from,
+        body: body,
+      };
+
+      emailDataArray.push(emailData);
+
+      fs.writeFileSync('gmail_data.json', JSON.stringify(emailDataArray, null, 2));
+
+      return {
+        id: message.id,
+        subject: subject,
+        from: from,
+      };
+
+    }));
+
+    res.json({ gatherType: 'gmail', information: emails });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const mails = await Promise.all(messages.map(async (message) => `<li>${await getEmail(message.id, gmail)}</li>`));
-
-  res.send(`<h2>Messages</h2><ul>${mails.join('')}</ul>`);
-  return;
-}
-
-async function getEmail(emailId, gmail) {
-  const response = await gmail.users.messages.get({ id: emailId, userId: 'me' });
-  const email = response.data;
-
-  const subject = email.payload.headers.find(e => e.name == 'Subject').value;
-  const from = email.payload.headers.find(e => e.name == 'From').value;
-
-  let body = 'No body content';
-  if (email.payload.parts) {
-    const part = email.payload.parts.find(part => part.mimeType === 'text/plain');
-    if (part?.body?.data) {
-      body = Buffer.from(part.body.data, 'base64').toString('utf8');
-    }
-  }
-
-  const emailData = {
-    subject: subject,
-    from: from,
-    body: body,
-  };
-
-  emailDataArray.push(emailData);
-
-  fs.writeFileSync('gmail_data.json', JSON.stringify(emailDataArray, null, 2));
-
-  return 'From:<b>' + from + '</b>\n' + subject;
 }
 
 // ----------------------------------- GOOGLE API ----------------------------------- //
@@ -94,35 +100,35 @@ async function getEmail(emailId, gmail) {
 // ----------------------------------- GITHUB API ----------------------------------- //
 
 app.get('/github/:username', async (req, res) => {
-    const { username } = req.params;
-  
-    try {
-      const response = await axios.get(`https://api.github.com/users/${username}`);
-      const userData = {
-        gatherType: "github",
-        information: {
-          login: response.data.login,
-          followers: response.data.followers,
-          following: response.data.following,
-          html_url: response.data.html_url,
-          avatar_url: response.data.avatar_url
-        }
-      };
-      res.json(userData);
-    } catch (error) {
-      res.status(500).json({
-        error: error.message || "Unknown Error",
-        gatherType: "github",
-        information: {
-          login: null,
-          followers: null,
-          following: null,
-          html_url: null,
-          avatar_url: null
-        }
-      });
-    }
-  });
+  const { username } = req.params;
+
+  try {
+    const response = await axios.get(`https://api.github.com/users/${username}`);
+    const userData = {
+      gatherType: "github",
+      information: {
+        login: response.data.login,
+        followers: response.data.followers,
+        following: response.data.following,
+        html_url: response.data.html_url,
+        avatar_url: response.data.avatar_url
+      }
+    };
+    res.json(userData);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || "Unknown Error",
+      gatherType: "github",
+      information: {
+        login: null,
+        followers: null,
+        following: null,
+        html_url: null,
+        avatar_url: null
+      }
+    });
+  }
+});
 
 // ----------------------------------- GITHUB API ----------------------------------- //
 

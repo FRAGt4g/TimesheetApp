@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FlatList, Text, Alert, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Gatherer, DataShape } from '@/app/(tabs)/layouts';
+import * as Linking from "expo-linking";
 import { SymbolView } from "expo-symbols";
 import axios from 'axios';
 import Spacer from '@/components/Spacer';
@@ -10,20 +11,27 @@ const gatherOptions = [
   {
     id: 'gmail',
     title: 'Fetch Gmail Data',
-    gatherFunc: async () => {
+    gatherFunc: async (): Promise<DataShape> => {
       try {
         const authResponse = await axios.get('http://localhost:8000/auth_google');
-        const authUrl = authResponse.data.authUrl;
+        
+        if (!authResponse || !authResponse.data) {
+          throw new Error('help api doesnt work');
+        }
+        
+        await Linking.openURL(authResponse.data)
 
-        Alert.alert('Authentication Required', `Authenticate with Google at: ${authUrl}`);
-        const code = prompt('Enter the code from the callback URL:');
-        if (!code) throw new Error('Authorization code is required.');
-
-        const dataResponse = await axios.get(`http://localhost:8000/auth_google_callback?code=${code}`);
-        return dataResponse.data;
+        return {
+          gatherType: "gmail success",
+          information: authResponse.data,
+        }
       } catch (error) {
         console.error('Error fetching Gmail data:', error);
-        return { error: 'Error fetching Gmail data' };
+        return { 
+          error: 'Error fetching Gmail data',
+          gatherType: 'gmail failure',
+          information: {},
+        };
       }
     },
   },
@@ -47,7 +55,16 @@ const gatherOptions = [
         };
       } catch (error) {
         console.error("Error fetching Github data:", error);
-        return { error: "Error fetching Github data" };
+        return { 
+          error: "Error fetching Github data",
+          gatherType: "github",
+          information: {
+            login: null,
+            followers: null,
+            following: null,
+            html_url: null,
+            avatar_url: null
+          }};
       }
     },
   },
@@ -71,18 +88,16 @@ const GatherButton = ({ item, onPress }: { item: Gatherer; onPress: (result: Dat
   const [loading, setLoading] = useState(false);
   
   const handleFetchData = async () => {
-    if (loading) {
-      setLoading(true);
-      return;
-    }
+    if (loading) return;
+    setLoading(true);
 
     try {
       const data = await gatherFunc();
-      setLoading(false);
       onPress(data);
     } catch (error) {
-      setLoading(false)
       console.error("Error during data fetching:", error);
+    } finally {
+      setLoading(false)
     }
   };
 

@@ -31,11 +31,18 @@ const oauth2Client = new google.auth.OAuth2(
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 
 app.get('/auth_google', (req, res) => {
+  console.log("In auth")
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES
   });
-  res.json({ authUrl: url })
+
+  userData = {
+    gatherType: "gmail",
+    information: url, 
+  }
+  
+  res.json(userData)
 });
 
 app.get('/google-callback', async (req, res) => {
@@ -43,7 +50,7 @@ app.get('/google-callback', async (req, res) => {
   const { tokens } = await oauth2Client.getToken(code);
   oauth2Client.setCredentials(tokens);
   readEmails(oauth2Client, res);
-  res.json({ message: 'Google Connected' });
+  // res.json({ message: 'Google Connected' });
 });
 
 async function readEmails(auth, res) {

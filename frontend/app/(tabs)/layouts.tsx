@@ -11,6 +11,7 @@ type DataShape = {
     error?: string,
     gatherType: string,
     information: object,
+    redirectUrl?: string,
 }
 
 export const initData = ({ 
